@@ -7,11 +7,12 @@ float[] z = new float[totalElements];
 float[] xSpeed = new float[totalElements];
 float[] ySpeed = new float[totalElements];
 float[] zSpeed = new float[totalElements];
-int lightX = 0;
-int lightY = 0;
-int lightZ = 0;
+float lightX = 0;
+float lightY = 0;
+float lightZ = 0;
+
 void setup() {
-  size(400, 400, P3D);
+  size(1280, 750, P3D);
   colorMode(HSB);
   lights();
   for (int i = 0; i < totalElements; i++) {
@@ -22,21 +23,19 @@ void setup() {
     ySpeed[i] = random(float(width+height)/200);
     zSpeed[i] = random(float(width+height)/200);
   }
+  lightX = float(width)/2;
+  lightY = float(height)/2;
+  lightZ = -float(height+width)/2;
 }
 
 void draw() {
   background(0);
-  ambientLight(100, 100, 100);
-  pointLight(255, 0, 255, float(width)/2, float(height)/2, -float(height+width)/4);
-  pushMatrix();
-  translate(float(width)/2, float(height)/2, -float(height+width)/4);
-  fill(255);
-  sphere(5);
-  popMatrix();
-  drawBox();
+  //drawBox();
   movePoints();
-  //drawBoxes, drawSpheres
-  drawSpheres(20);
+  //drawBoxes(size), drawSpheres(size), drawLines(maxDistance, size, detail), sceneLighting()
+  drawLines(600, 10, 100);
+  drawSpheres(10);
+  sceneLighting();
 }
 
 void drawBox() {
@@ -127,6 +126,37 @@ void drawSpheres(int size) {
   }
 }
 
+void drawLines(int maxDistance, int size, int detail) {
+  for (int i = 0; i < totalElements; i++) {
+    pushMatrix();
+    translate(x[i], y[i], -z[i]);
+    noStroke();
+    fill(255*(float(i)/float(totalElements)), 255, 255);
+    sphere(1);
+    popMatrix();
+    for (int j = 0; j < totalElements; j++) {
+      if (j != i) {
+        if (sqrt(pow(x[i]-x[j], 2) + pow(y[i]-y[j], 2) + pow(z[i]-y[j], 2)) < maxDistance) {
+          float distance = sqrt(pow(x[i]-x[j], 2) + pow(y[i]-y[j], 2) + pow(z[i]-y[j], 2));
+          float xChange = (x[i] - x[j])/detail;
+          float yChange = (y[i] - y[j])/detail;
+          float zChange = (z[i] - z[j])/detail;
+          for (int l = 0; l < detail; l++) {
+            pushMatrix();
+            translate(x[j] + xChange * l, y[j] + yChange * l, -z[j] - zChange * l);
+            float color1 = 255*(float(i)/float(totalElements));
+            float color2 = 255*(float(j)/float(totalElements));
+            float colorChange = color1 - color2;
+            fill(color2 + colorChange, 255, 255, 255-255*distance/maxDistance);
+            ellipse(0, 0, size, size);
+            popMatrix();
+          }
+        }
+      }
+    }
+  }
+}
+
 void movePoints() {
   for (int i = 0; i < totalElements; i++) {
     x[i] += xSpeed[i];
@@ -142,4 +172,17 @@ void movePoints() {
       zSpeed[i] *= -1;
     }
   }
+}
+
+void moveLighting() {
+}
+
+void sceneLighting() {
+  ambientLight(100, 100, 100);
+  pointLight(255, 0, 255, float(width)/2, float(height)/2, -float(height+width)/4);
+  pushMatrix();
+  translate(lightX, lightY, lightZ);
+  fill(255);
+  sphere(5);
+  popMatrix();
 }
