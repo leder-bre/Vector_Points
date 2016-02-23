@@ -34,8 +34,14 @@ void draw() {
   movePoints();
   //drawBoxes(size), drawSpheres(size), drawLines(maxDistance, size, detail), sceneLighting()
   drawLines(600, 10, 100);
-  drawSpheres(10);
+  //drawSpheres(30);
+  drawBoxes(30);
   sceneLighting();
+  pushMatrix();
+  translate(0, height/2, -float(height+width)/4);
+  fill(170);
+  box(4, height, float(height+width)/2);
+  popMatrix();
 }
 
 void drawBox() {
@@ -178,8 +184,8 @@ void moveLighting() {
 }
 
 void sceneLighting() {
-  ambientLight(100, 100, 100);
-  pointLight(255, 0, 255, float(width)/2, float(height)/2, -float(height+width)/4);
+  //ambientLight(100, 100, 100);
+  pointLight(100, 100, 100, float(width)/2, float(height)/2, -float(height+width)/4);
   pushMatrix();
   translate(lightX, lightY, lightZ);
   fill(255);
